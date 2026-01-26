@@ -1,33 +1,26 @@
 # Jogo da Velha 🎮
 
-Projeto de Jogo da Velha (Tic-Tac-Toe) desenvolvido com HTML, CSS e JavaScript, aplicando na prática os conceitos estudados no curso Fullstack JavaScript da OneBitCode.
+Projeto de **jogo da velha** feito para treinar HTML, CSS e JavaScript, agora no modo **1 jogador contra a IA**.
 
-## 🔗 Demo
+O jogador humano controla o **X** e o computador joga com o **O**. A cada jogada, o jogo verifica vitória ou empate, destaca a linha vencedora e permite reiniciar para começar outra partida.
 
-Acesse o jogo online aqui:  
-https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO
+## Tecnologias
 
-(Substitua pelo link do GitHub Pages do seu repositório.)
+- HTML5 para estrutura da página
+- CSS3 para layout, cores, animações e responsividade
+- JavaScript para a lógica do jogo e manipulação do DOM
 
-## 🚀 Tecnologias utilizadas
+## O que o jogo faz
 
-- HTML5
-- CSS3 (layout responsivo, grid, animações)
-- JavaScript (lógica de jogo e manipulação do DOM)
+- Permite digitar o nome do jogador
+- Mostra de quem é a vez na tela
+- Jogador escolhe uma casa do tabuleiro e a IA responde sozinha
+- Destaca as casas da combinação vencedora
+- Exibe mensagem de vitória ou empate
+- Botão para reiniciar a partida
 
-## 🕹️ Funcionalidades
+## Como rodar
 
-- Cadastro dos nomes dos dois jogadores (X e O)
-- Indicação na tela do jogador da vez
-- Tabuleiro interativo 3x3 atualizado a cada clique
-- Bloqueio de casas já marcadas
-- Detecção automática de vitória e destaque das casas vencedoras
-- Mensagem de empate quando não há vencedor
-- Botão para reiniciar e jogar novamente
-
-## 🧠 Conceitos praticados
-
-- Manipulação do DOM (events, classes, texto, atributos)
-- Lógica de programação aplicada em jogos
-- Controle de estado da aplicação (tabuleiro, turno, vencedor)
-- Organização do projeto com HTML, CSS e JavaScript separados
+- Acesse a versão online:  
+  [**https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO**](https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO)
+- Ou baixe o projeto e abra o arquivo `index.html` no navegador.
