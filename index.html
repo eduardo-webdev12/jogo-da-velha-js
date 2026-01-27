@@ -9,14 +9,19 @@
 <body>
     <div class="header">
         <h1>Jogo da Velha</h1>
+
         <div class="players">
-            <input type="text" id="player1" placeholder="Jogador X" value="Jogador 1">
-            <input type="text" id="player2" placeholder="Jogador O" value="Jogador 2">
+            <input type="text" id="player1" placeholder="Seu nome (X)" value="Jogador 1">
             <button id="startBtn">Iniciar Jogo</button>
+        </div>
+
+        <div class="players-names">
+            <span id="humanLabel"></span>
+            <span id="aiLabel"></span>
         </div>
     </div>
     
-    <div id="status" class="status">Clique em "Iniciar Jogo"</div>
+    <div id="status" class="status">Digite seu nome e clique em "Iniciar Jogo"</div>
     
     <div id="board" class="board">
         <div class="cell" data-index="0"></div>
