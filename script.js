@@ -5,12 +5,13 @@ let humanName = 'Jogador 1';     // nome do humano
 let aiName = 'Computador';       // nome da IA
 
 // -------- ELEMENTOS DO DOM --------
-const player1Input = document.getElementById('player1'); // nome do humano
-const player2Input = document.getElementById('player2'); // ignorado (IA fixa)
+const player1Input = document.getElementById('player1');
 const startBtn = document.getElementById('startBtn');
 const statusEl = document.getElementById('status');
 const restartBtn = document.getElementById('restart');
 const cells = document.querySelectorAll('.cell');
+const humanLabel = document.getElementById('humanLabel');
+const aiLabel = document.getElementById('aiLabel');
 
 // combinações vencedoras
 const winningConditions = [
@@ -26,6 +27,9 @@ function startGame() {
   humanName = player1Input.value.trim() || 'Jogador 1';
   aiName = 'Computador';
 
+  humanLabel.textContent = `${humanName} (X)`;
+  aiLabel.textContent = `${aiName} (O)`;
+
   resetBoard();
   gameActive = true;
 
@@ -39,10 +43,8 @@ function startGame() {
 function handleCellClick(event) {
   const index = parseInt(event.target.dataset.index);
 
-  // se jogo acabou OU casa já ocupada, não faz nada
   if (!gameActive || board[index] !== null) return;
 
-  // jogada do humano (sempre X)
   humanMove(index);
 }
 
@@ -50,14 +52,11 @@ function handleCellClick(event) {
 function humanMove(index) {
   makeMove(index, 'X');
 
-  // verifica se o humano ganhou ou empatou
   if (checkEndGame('X', humanName)) return;
 
-  // trava cliques enquanto IA joga
   gameActive = false;
   statusEl.textContent = `🤖 ${aiName} pensando...`;
 
-  // pequeno delay para ficar mais natural
   setTimeout(() => {
     aiMove();
   }, 500);
@@ -75,10 +74,8 @@ function aiMove() {
 
   makeMove(randomIndex, 'O');
 
-  // verifica se a IA ganhou ou empatou
   if (checkEndGame('O', aiName)) return;
 
-  // devolve o turno para o humano
   gameActive = true;
   statusEl.textContent = `🕐 Vez de ${humanName}`;
 }
@@ -154,7 +151,6 @@ startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', restartGame);
 cells.forEach(cell => cell.addEventListener('click', handleCellClick));
 
-// apertar Enter no input do jogador também inicia o jogo
 player1Input.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') startGame();
 });
