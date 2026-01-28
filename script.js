@@ -1,5 +1,5 @@
 // =============================================
-// JOGO DA VELHA - versão bem comentada
+//             JOGO DA VELHA 
 // =============================================
 
 let tabuleiro = Array(9).fill(null);
@@ -153,3 +153,4 @@ casas.forEach(casa => {
 inputNome.addEventListener("keypress", e => {
   if (e.key === "Enter") iniciarPartida();
 });
+
