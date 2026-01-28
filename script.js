@@ -1,4 +1,4 @@
-// JOGO DA VELHA - IA IMBATÍVEL COM MINIMAX
+// JOGO DA VELHA - COM IA
 // ========================================
 
 let tabuleiro = Array(9).fill(null);
@@ -203,3 +203,4 @@ casas.forEach(casa => casa.addEventListener("click", clicouNaCasa));
 inputNome.addEventListener("keypress", e => {
   if (e.key === "Enter") iniciarPartida();
 });
+
