@@ -1,156 +1,155 @@
-// -------- ESTADO DO JOGO --------
-let board = Array(9).fill(null); // tabuleiro (0 a 8)
-let gameActive = false;          // se o jogo está rolando
-let humanName = 'Jogador 1';     // nome do humano
-let aiName = 'Computador';       // nome da IA
+// =============================================
+// JOGO DA VELHA - versão bem comentada
+// =============================================
 
-// -------- ELEMENTOS DO DOM --------
-const player1Input = document.getElementById('player1');
-const startBtn = document.getElementById('startBtn');
-const statusEl = document.getElementById('status');
-const restartBtn = document.getElementById('restart');
-const cells = document.querySelectorAll('.cell');
-const humanLabel = document.getElementById('humanLabel');
-const aiLabel = document.getElementById('aiLabel');
+let tabuleiro = Array(9).fill(null);
+let jogoAtivo = false;
+let nomeJogador = "Jogador 1";
+let nomePC = "Computador";
 
-// combinações vencedoras
-const winningConditions = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // linhas
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // colunas
-  [0, 4, 8], [2, 4, 6]             // diagonais
+// Elementos da tela
+const inputNome     = document.getElementById("player1");
+const btnIniciar    = document.getElementById("startBtn");
+const statusTexto   = document.getElementById("status");
+const btnReiniciar  = document.getElementById("restart");
+const casas         = document.querySelectorAll(".cell");
+const labelJogador  = document.getElementById("humanLabel");
+const labelPC       = document.getElementById("aiLabel");
+
+// Combinações vencedoras
+const vitorias = [
+  [0,1,2], [3,4,5], [6,7,8],   // linhas
+  [0,3,6], [1,4,7], [2,5,8],   // colunas
+  [0,4,8], [2,4,6]             // diagonais
 ];
 
-// -------- FUNÇÕES PRINCIPAIS --------
+// =============================================
+// FUNÇÕES
+// =============================================
 
-// iniciar o jogo
-function startGame() {
-  humanName = player1Input.value.trim() || 'Jogador 1';
-  aiName = 'Computador';
+function iniciarPartida() {
+  nomeJogador = inputNome.value.trim() || "Jogador 1";
 
-  humanLabel.textContent = `${humanName} (X)`;
-  aiLabel.textContent = `${aiName} (O)`;
+  labelJogador.textContent = nomeJogador + " (X)";
+  labelPC.textContent      = nomePC + " (O)";
 
-  resetBoard();
-  gameActive = true;
+  limparTudo();
+  jogoAtivo = true;
 
-  statusEl.textContent = `🕹️ ${humanName} (X) vs ${aiName} (O)`;
-  setTimeout(() => {
-    statusEl.textContent = `🕐 Vez de ${humanName}`;
-  }, 800);
-}
-
-// clique do jogador humano
-function handleCellClick(event) {
-  const index = parseInt(event.target.dataset.index);
-
-  if (!gameActive || board[index] !== null) return;
-
-  humanMove(index);
-}
-
-// jogada do humano
-function humanMove(index) {
-  makeMove(index, 'X');
-
-  if (checkEndGame('X', humanName)) return;
-
-  gameActive = false;
-  statusEl.textContent = `🤖 ${aiName} pensando...`;
+  statusTexto.textContent = `Partida: ${nomeJogador} × ${nomePC}`;
 
   setTimeout(() => {
-    aiMove();
-  }, 500);
+    statusTexto.textContent = `Vez de ${nomeJogador}`;
+  }, 700);
 }
 
-// jogada da IA (aleatória simples)
-function aiMove() {
-  const emptyIndices = board
-    .map((value, index) => (value === null ? index : null))
-    .filter(index => index !== null);
+function clicouNaCasa(e) {
+  const casa = e.target;
+  const indice = Number(casa.dataset.index);
 
-  if (emptyIndices.length === 0) return;
+  if (!jogoAtivo) return;
+  if (tabuleiro[indice] !== null) return;
 
-  const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  jogar(indice, "X");
 
-  makeMove(randomIndex, 'O');
+  if (verificarFimDeJogo("X", nomeJogador)) return;
 
-  if (checkEndGame('O', aiName)) return;
+  jogoAtivo = false;
+  statusTexto.textContent = `${nomePC} está pensando...`;
 
-  gameActive = true;
-  statusEl.textContent = `🕐 Vez de ${humanName}`;
+  setTimeout(jogadaDoPC, 500);
 }
 
-// marca jogada no tabuleiro e na interface
-function makeMove(index, symbol) {
-  board[index] = symbol;
+function jogar(pos, simbolo) {
+  tabuleiro[pos] = simbolo;
 
-  const cell = document.querySelector(`.cell[data-index="${index}"]`);
-  if (!cell) return;
-
-  cell.textContent = symbol;
-  cell.classList.add(symbol.toLowerCase(), 'occupied');
+  const celula = document.querySelector(`.cell[data-index="${pos}"]`);
+  celula.textContent = simbolo;
+  celula.classList.add(simbolo.toLowerCase(), "ocupada");
 }
 
-// verifica vitória/empate para um símbolo
-function checkEndGame(symbol, name) {
-  if (checkWinner(symbol)) {
-    highlightWinner(symbol);
-    statusEl.textContent = `${name} venceu! 🎉`;
-    gameActive = false;
-    restartBtn.classList.remove('hidden');
+function jogadaDoPC() {
+  let vazias = [];
+  for (let i = 0; i < 9; i++) {
+    if (tabuleiro[i] === null) vazias.push(i);
+  }
+
+  if (vazias.length === 0) return;
+
+  const sorteado = Math.floor(Math.random() * vazias.length);
+  const posicao = vazias[sorteado];
+
+  jogar(posicao, "O");
+
+  if (verificarFimDeJogo("O", nomePC)) return;
+
+  jogoAtivo = true;
+  statusTexto.textContent = `Vez de ${nomeJogador}`;
+}
+
+function verificarFimDeJogo(simbolo, nome) {
+  if (teveVencedor(simbolo)) {
+    pintarVencedor(simbolo);
+    statusTexto.textContent = `${nome} ganhou! 🏆`;
+    jogoAtivo = false;
+    btnReiniciar.classList.remove("hidden");
     return true;
   }
 
-  if (board.every(cell => cell !== null)) {
-    statusEl.textContent = 'Empate! 🤝 Reinicie para jogar novamente.';
-    gameActive = false;
-    restartBtn.classList.remove('hidden');
+  if (tabuleiro.every(c => c !== null)) {
+    statusTexto.textContent = "Deu velha! 😐";
+    jogoAtivo = false;
+    btnReiniciar.classList.remove("hidden");
     return true;
   }
 
   return false;
 }
 
-// verifica se um símbolo venceu
-function checkWinner(symbol) {
-  return winningConditions.some(condition =>
-    condition.every(index => board[index] === symbol)
+function teveVencedor(simbolo) {
+  return vitorias.some(combo => 
+    combo.every(pos => tabuleiro[pos] === simbolo)
   );
 }
 
-// destaca as casas vencedoras
-function highlightWinner(symbol) {
-  winningConditions.forEach(condition => {
-    if (condition.every(index => board[index] === symbol)) {
-      condition.forEach(index => {
-        cells[index].classList.add('winner');
+function pintarVencedor(simbolo) {
+  vitorias.forEach(combo => {
+    if (combo.every(pos => tabuleiro[pos] === simbolo)) {
+      combo.forEach(pos => {
+        casas[pos].classList.add("vencedor");
       });
     }
   });
 }
 
-// limpa o tabuleiro visual e o estado
-function resetBoard() {
-  board = Array(9).fill(null);
-  cells.forEach(cell => {
-    cell.textContent = '';
-    cell.classList.remove('x', 'o', 'occupied', 'winner');
+function limparTudo() {
+  tabuleiro = Array(9).fill(null);
+
+  casas.forEach(casa => {
+    casa.textContent = "";
+    casa.classList.remove("x", "o", "ocupada", "vencedor");
   });
-  restartBtn.classList.add('hidden');
+
+  btnReiniciar.classList.add("hidden");
 }
 
-// reiniciar jogo (mantendo nomes)
-function restartGame() {
-  resetBoard();
-  gameActive = true;
-  statusEl.textContent = `🕐 Vez de ${humanName}`;
+function reiniciarJogo() {
+  limparTudo();
+  jogoAtivo = true;
+  statusTexto.textContent = `Vez de ${nomeJogador}`;
 }
 
-// -------- EVENT LISTENERS --------
-startBtn.addEventListener('click', startGame);
-restartBtn.addEventListener('click', restartGame);
-cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+// =============================================
+// Eventos
+// =============================================
 
-player1Input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') startGame();
+btnIniciar.addEventListener("click", iniciarPartida);
+btnReiniciar.addEventListener("click", reiniciarJogo);
+
+casas.forEach(casa => {
+  casa.addEventListener("click", clicouNaCasa);
+});
+
+inputNome.addEventListener("keypress", e => {
+  if (e.key === "Enter") iniciarPartida();
 });
