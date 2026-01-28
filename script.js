@@ -2,7 +2,7 @@
 
 let tabuleiro = Array(9).fill(null);
 let jogoAtivo = false;
-let nomeJogador = "Eduardo";
+let nomeJogador = "Jogador";
 let simboloJogador = 'X';
 let simboloIA = 'O';
 let nivelIA = 'dificil';
@@ -219,3 +219,4 @@ inputNome.addEventListener("keypress", e => {
 
 // Inicializa placar
 carregarPlacar();
+
