@@ -1,91 +1,106 @@
-// JOGO DA VELHA - COM IA
-// ========================================
+// JOGO DA VELHA - NÍVEIS DE IA + PLACAR PERSISTENTE
 
 let tabuleiro = Array(9).fill(null);
 let jogoAtivo = false;
-let nomeJogador = "Jogador 1";
+let nomeJogador = "Eduardo";
 let simboloJogador = 'X';
 let simboloIA = 'O';
+let nivelIA = 'dificil';
 
-// Elementos
+let placar = { vitoriasJogador: 0, vitoriasIA: 0, empates: 0 };
+
+// Elementos DOM
 const entrada = document.getElementById("entrada");
 const inputNome = document.getElementById("player1");
+const selectNivel = document.getElementById("nivelSelect");
 const btnIniciar = document.getElementById("startBtn");
 const statusTexto = document.getElementById("status");
+const placarEl = document.getElementById("placar");
+const vitoriasJ = document.getElementById("vitoriasJogador");
+const vitoriasIAEl = document.getElementById("vitoriasIA");
+const empatesEl = document.getElementById("empates");
 const btnReiniciar = document.getElementById("restart");
 const casas = document.querySelectorAll(".cell");
 const labelJogador = document.getElementById("humanLabel");
 const labelIA = document.getElementById("aiLabel");
 
 // Combinações vencedoras
-const vitorias = [
-  [0,1,2], [3,4,5], [6,7,8],
-  [0,3,6], [1,4,7], [2,5,8],
-  [0,4,8], [2,4,6]
-];
+const vitorias = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-// =============================================
-// FUNÇÕES BÁSICAS
-// =============================================
+// Carregar placar do localStorage
+function carregarPlacar() {
+  const salvo = localStorage.getItem('jogoVelhaPlacar');
+  if (salvo) placar = JSON.parse(salvo);
+  atualizarPlacar();
+}
 
+function salvarPlacar() {
+  localStorage.setItem('jogoVelhaPlacar', JSON.stringify(placar));
+}
+
+function atualizarPlacar() {
+  vitoriasJ.textContent = placar.vitoriasJogador;
+  vitoriasIAEl.textContent = placar.vitoriasIA;
+  empatesEl.textContent = placar.empates;
+}
+
+// Iniciar partida
 function iniciarPartida() {
-  nomeJogador = inputNome.value.trim() || "Jogador 1";
+  nomeJogador = inputNome.value.trim() || "Eduardo";
+  nivelIA = selectNivel.value;
 
   labelJogador.textContent = nomeJogador + " (X)";
-  labelIA.textContent = "IA" + " (O)";
+  labelIA.textContent = `IA ${nivelIA.charAt(0).toUpperCase() + nivelIA.slice(1)} (O)`;
 
-  // Esconde entrada
   entrada.classList.add("hidden");
+  placarEl.classList.remove("hidden");
 
   limparTudo();
   jogoAtivo = true;
-
   statusTexto.textContent = `Vez de ${nomeJogador} (X)`;
-
-  // setTimeout(jogadaDaIA, 600);
 }
 
+// Clique na casa
 function clicouNaCasa(e) {
   const indice = Number(e.target.dataset.index);
-
-  if (!jogoAtivo) return;
-  if (tabuleiro[indice] !== null) return;
+  if (!jogoAtivo || tabuleiro[indice] !== null) return;
 
   fazerJogada(indice, simboloJogador);
-
-  if (verificarFimDeJogo(simboloJogador, nomeJogador)) return;
+  if (verificarFimDeJogo(simboloJogador, nomeJogador, true)) return;
 
   jogoAtivo = false;
   statusTexto.textContent = "IA pensando...";
-
-  // Pequeno delay para parecer que está "pensando"
-  setTimeout(jogadaDaIA, 400);
+  setTimeout(jogadaDaIA, 400 + Math.random() * 300);
 }
 
 function fazerJogada(pos, simbolo) {
   tabuleiro[pos] = simbolo;
-
   const celula = casas[pos];
   celula.textContent = simbolo;
   celula.classList.add(simbolo.toLowerCase(), "ocupada");
 }
 
-function verificarFimDeJogo(simbolo, nome) {
+function verificarFimDeJogo(simbolo, nome, ehJogador) {
   if (teveVencedor(simbolo)) {
     pintarVencedor(simbolo);
     statusTexto.textContent = `${nome} ganhou! 🏆`;
     jogoAtivo = false;
     btnReiniciar.classList.remove("hidden");
+    if (ehJogador) placar.vitoriasJogador++;
+    else placar.vitoriasIA++;
+    salvarPlacar();
+    atualizarPlacar();
     return true;
   }
-
   if (tabuleiro.every(c => c !== null)) {
     statusTexto.textContent = "Deu velha! 😐";
     jogoAtivo = false;
     btnReiniciar.classList.remove("hidden");
+    placar.empates++;
+    salvarPlacar();
+    atualizarPlacar();
     return true;
   }
-
   return false;
 }
 
@@ -112,91 +127,95 @@ function limparTudo() {
 
 function reiniciarJogo() {
   limparTudo();
-  entrada.classList.remove("hidden");  // Mostra novamente o input
-  statusTexto.textContent = "Digite seu nome e clique em Iniciar";
+  entrada.classList.remove("hidden");
+  placarEl.classList.add("hidden");
+  statusTexto.textContent = "Digite seu nome e escolha a dificuldade!";
   jogoAtivo = false;
 }
 
+// ===================================
+// LÓGICA DA IA POR NÍVEL
+// ===================================
 function jogadaDaIA() {
-  const melhorMovimento = minimax(tabuleiro, simboloIA).index;
-  fazerJogada(melhorMovimento, simboloIA);
+  let posicao;
+  if (nivelIA === 'facil') {
+    posicao = jogadaFacil();
+  } else if (nivelIA === 'medio') {
+    posicao = jogadaMedia();
+  } else {
+    posicao = minimax(tabuleiro, simboloIA).index;
+  }
 
-  verificarFimDeJogo(simboloIA, "IA");
+  fazerJogada(posicao, simboloIA);
+  verificarFimDeJogo(simboloIA, "IA", false);
 
   jogoAtivo = true;
   statusTexto.textContent = `Vez de ${nomeJogador}`;
 }
 
-// Função principal do Minimax (recursiva)
-function minimax(novoTabuleiro, jogador) {
-  // Encontra posições vazias
-  const posicoesVazias = novoTabuleiro.reduce((acc, val, idx) => 
-    val === null ? acc.concat(idx) : acc, []);
+function jogadaFacil() {
+  let vazias = [];
+  for (let i = 0; i < 9; i++) if (tabuleiro[i] === null) vazias.push(i);
+  return vazias[Math.floor(Math.random() * vazias.length)];
+}
 
-  // Casos terminais
-  if (teveVencedor(simboloJogador)) return { score: -10 };
-  if (teveVencedor(simboloIA))     return { score: +10 };
-  if (posicoesVazias.length === 0) return { score: 0 };
-
-  // Coleta todos os movimentos possíveis + scores
-  const movimentos = [];
-
-  for (let i = 0; i < posicoesVazias.length; i++) {
-    const indice = posicoesVazias[i];
-
-    // Simula a jogada
-    novoTabuleiro[indice] = jogador;
-
-    let resultado;
-    if (jogador === simboloIA) {
-      resultado = minimax(novoTabuleiro, simboloJogador);
-      movimentos.push({ index: indice, score: resultado.score });
-    } else {
-      resultado = minimax(novoTabuleiro, simboloIA);
-      movimentos.push({ index: indice, score: resultado.score });
+function jogadaMedia() {
+  // Tenta ganhar
+  for (let i = 0; i < 9; i++) {
+    if (tabuleiro[i] === null) {
+      tabuleiro[i] = simboloIA;
+      if (teveVencedor(simboloIA)) {
+        tabuleiro[i] = null;
+        return i;
+      }
+      tabuleiro[i] = null;
     }
+  }
+  // Bloqueia o jogador
+  for (let i = 0; i < 9; i++) {
+    if (tabuleiro[i] === null) {
+      tabuleiro[i] = simboloJogador;
+      if (teveVencedor(simboloJogador)) {
+        tabuleiro[i] = null;
+        return i;
+      }
+      tabuleiro[i] = null;
+    }
+  }
+  // Senão, aleatória
+  return jogadaFacil();
+}
 
-    // Desfaz a jogada (backtrack)
+function minimax(novoTabuleiro, jogador) {
+  const vazias = novoTabuleiro.reduce((acc, val, idx) => val === null ? acc.concat(idx) : acc, []);
+
+  if (teveVencedor(simboloJogador)) return { score: -10 };
+  if (teveVencedor(simboloIA)) return { score: 10 };
+  if (vazias.length === 0) return { score: 0 };
+
+  const movimentos = [];
+  for (let i = 0; i < vazias.length; i++) {
+    const indice = vazias[i];
+    novoTabuleiro[indice] = jogador;
+    const resultado = minimax(novoTabuleiro, jogador === simboloIA ? simboloJogador : simboloIA);
+    movimentos.push({ index: indice, score: resultado.score });
     novoTabuleiro[indice] = null;
   }
 
-  let melhorMovimento;
+  let melhor = jogador === simboloIA 
+    ? movimentos.reduce((prev, curr) => curr.score > prev.score ? curr : prev)
+    : movimentos.reduce((prev, curr) => curr.score < prev.score ? curr : prev);
 
-  // MAX (IA) quer o maior score
-  if (jogador === simboloIA) {
-    let melhorScore = -Infinity;
-    for (let i = 0; i < movimentos.length; i++) {
-      if (movimentos[i].score > melhorScore) {
-        melhorScore = movimentos[i].score;
-        melhorMovimento = i;
-      }
-    }
-  } 
-  // MIN (jogador humano) quer o menor score
-  else {
-    let melhorScore = +Infinity;
-    for (let i = 0; i < movimentos.length; i++) {
-      if (movimentos[i].score < melhorScore) {
-        melhorScore = movimentos[i].score;
-        melhorMovimento = i;
-      }
-    }
-  }
-
-  return movimentos[melhorMovimento];
+  return melhor;
 }
 
-// =============================================
 // Eventos
-// =============================================
-
 btnIniciar.addEventListener("click", iniciarPartida);
 btnReiniciar.addEventListener("click", reiniciarJogo);
-
 casas.forEach(casa => casa.addEventListener("click", clicouNaCasa));
-
 inputNome.addEventListener("keypress", e => {
   if (e.key === "Enter") iniciarPartida();
 });
 
-
+// Inicializa placar
+carregarPlacar();
