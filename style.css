@@ -1,7 +1,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: white;
   min-height: 100vh;
@@ -17,111 +17,105 @@ h1 { font-size: 2.6rem; margin-bottom: 25px; text-shadow: 2px 2px 8px rgba(0,0,0
 
 .entrada-jogadores {
   display: flex;
-  gap: 12px;
+  gap: 12px;                  /* aumentei um pouco o espaço entre os itens */
   margin-bottom: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;        /* alinha todos verticalmente no meio */
 }
 
-input {
+input, select {
   padding: 12px 18px;
   font-size: 1.1rem;
   border: none;
   border-radius: 30px;
-  width: 220px;
+  background: rgba(255,255,255,0.95);
+  color: #333;
+  width: 160px;               /* ou aumente para 180px se quiser maior */
   max-width: 100%;
+  height: 48px;               /* altura fixa ajuda no alinhamento */
+  text-align: center;         /* texto dentro do input/select centralizado */
 }
 
 button {
-  padding: 12px 28px;
-  font-size: 1.1rem;
+  padding: 14px 36px;         /* ← AUMENTEI o padding (maior largura e altura) */
+  font-size: 1.15rem;         /* um pouco maior que antes */
   font-weight: bold;
   border: none;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.25s;
+  min-width: 160px;           /* garante largura mínima maior */
+  height: 48px;               /* mesma altura do input e select */
+  display: flex;              /* importante para centralizar texto */
+  align-items: center;        /* centraliza texto verticalmente */
+  justify-content: center;    /* centraliza texto horizontalmente */
+  text-align: center;         /* reforço extra */
 }
 
-#startBtn { background: #28a745; color: white; }
-#startBtn:hover { background: #218838; transform: translateY(-2px); }
+/* Botão específico de iniciar */
+#startBtn {
+  background: #28a745;
+  color: white;
+}
+
+#startBtn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(33,136,56,0.4);
+}
 
 .nomes-jogadores {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 15px 0 25px;
-  font-size: 1.2rem;
-  font-weight: bold;
+  display: flex; justify-content: center; gap: 20px; margin: 15px 0 10px; font-size: 1.2rem; font-weight: bold;
 }
 
-.nomes-jogadores span {
-  padding: 6px 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.15);
+.nomes-jogadores span { padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); }
+
+.placar {
+  font-size: 1.3rem; font-weight: bold; margin: 10px 0 25px;
+  background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 25px;
 }
 
 .status { font-size: 1.4rem; min-height: 50px; margin-bottom: 25px; font-weight: bold; }
 
 .tabuleiro {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  max-width: 360px;
-  margin: 0 auto 30px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 360px; margin: 0 auto 30px;
 }
 
 .cell {
-  aspect-ratio: 1 / 1;
-  background: rgba(255,255,255,0.92);
-  border-radius: 12px;
-  font-size: 3.8rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: all 0.2s;
+  aspect-ratio: 1/1; background: rgba(255,255,255,0.92); border-radius: 12px; font-size: 3.8rem; font-weight: bold;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s;
 }
 
-.cell:hover:not(.ocupada) {
-  background: white;
-  transform: scale(1.04);
-}
+.cell:hover:not(.ocupada) { background: white; transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
 .cell.x { color: #dc3545; }
 .cell.o { color: #007bff; }
-
 .cell.ocupada { cursor: default; }
-
 .cell.vencedor {
-  background: #ffc107 !important;
-  color: #222 !important;
-  animation: pisca 0.7s infinite alternate;
+  background: linear-gradient(45deg, #ffc107, #ff9800) !important; color: white !important;
+  animation: pisca 0.6s infinite alternate; box-shadow: 0 0 30px rgba(255,193,7,0.7) !important;
 }
 
-@keyframes pisca {
-  from { transform: scale(1); }
-  to   { transform: scale(1.06); }
-}
+@keyframes pisca { from { transform: scale(1); } to { transform: scale(1.08); } }
 
 .btn-reiniciar {
-  padding: 14px 40px;
-  font-size: 1.3rem;
-  background: #fd7e14;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  margin-top: 10px;
+  padding: 14px 40px; font-size: 1.3rem; background: #fd7e14; color: white; border: none;
+  border-radius: 30px; cursor: pointer; margin-top: 10px;
 }
-
 .btn-reiniciar:hover { background: #e06c00; transform: translateY(-3px); }
 
 .hidden { display: none !important; }
 
 @media (max-width: 480px) {
-  .tabuleiro { max-width: 300px; gap: 8px; }
-  .cell { font-size: 3rem; }
+  .entrada-jogadores {
+    flex-direction: column;     /* empilha um embaixo do outro */
+    gap: 14px;
+  }
+  
+  input, select, button {
+    width: 100%;                /* ocupa toda a largura */
+    max-width: none;
+  }
 }
