@@ -42,7 +42,6 @@ function iniciarPartida() {
 
   statusTexto.textContent = `Vez de ${nomeJogador} (X)`;
 
-  // Se quiser que a IA comece primeiro, descomente abaixo:
   // setTimeout(jogadaDaIA, 600);
 }
 
@@ -117,10 +116,6 @@ function reiniciarJogo() {
   statusTexto.textContent = "Digite seu nome e clique em Iniciar";
   jogoAtivo = false;
 }
-
-// =============================================
-// IA IMBATÍVEL - ALGORITMO MINIMAX
-// =============================================
 
 function jogadaDaIA() {
   const melhorMovimento = minimax(tabuleiro, simboloIA).index;
@@ -203,4 +198,5 @@ casas.forEach(casa => casa.addEventListener("click", clicouNaCasa));
 inputNome.addEventListener("keypress", e => {
   if (e.key === "Enter") iniciarPartida();
 });
+
 
