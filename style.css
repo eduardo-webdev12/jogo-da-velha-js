@@ -1,221 +1,121 @@
-// JOGO DA VELHA - NÍVEIS DE IA + PLACAR
-let tabuleiro = Array(9).fill(null);
-let jogoAtivo = false;
-let nomeJogador = "Jogador 1";
-let simboloJogador = 'X';
-let simboloIA = 'O';
-let nivelIA = 'dificil';  // ← NOVO: nível atual
+* { margin:0; padding:0; box-sizing:border-box; }
 
-// Placar (salvo no navegador)
-let placar = { vitoriasJogador: 0, vitoriasIA: 0, empates: 0 };
-
-// Elementos
-const entrada = document.getElementById("entrada");
-const inputNome = document.getElementById("player1");
-const selectNivel = document.getElementById("nivelSelect");
-const btnIniciar = document.getElementById("startBtn");
-const statusTexto = document.getElementById("status");
-const placarEl = document.getElementById("placar");
-const vitoriasJ = document.getElementById("vitoriasJogador");
-const vitoriasIAEl = document.getElementById("vitoriasIA");
-const empatesEl = document.getElementById("empates");
-const btnReiniciar = document.getElementById("restart");
-const casas = document.querySelectorAll(".cell");
-const labelJogador = document.getElementById("humanLabel");
-const labelIA = document.getElementById("aiLabel");
-
-// Combinações vencedoras
-const vitorias = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-
-// Carrega placar salvo
-function carregarPlacar() {
-  const salvo = localStorage.getItem('jogoVelhaPlacar');
-  if (salvo) placar = JSON.parse(salvo);
-  atualizarPlacar();
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
 }
 
-function salvarPlacar() {
-  localStorage.setItem('jogoVelhaPlacar', JSON.stringify(placar));
+.container { text-align: center; max-width: 420px; width: 100%; }
+
+h1 { font-size: 2.6rem; margin-bottom: 25px; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); }
+
+.entrada-jogadores {
+  display: flex;
+  gap: 12px;                  /* aumentei um pouco o espaço entre os itens */
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;        /* alinha todos verticalmente no meio */
 }
 
-function atualizarPlacar() {
-  vitoriasJ.textContent = placar.vitoriasJogador;
-  vitoriasIAEl.textContent = placar.vitoriasIA;
-  empatesEl.textContent = placar.empates;
+input, select {
+  padding: 12px 18px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.95);
+  color: #333;
+  width: 160px;               /* ou aumente para 180px se quiser maior */
+  max-width: 100%;
+  height: 48px;               /* altura fixa ajuda no alinhamento */
+  text-align: center;         /* texto dentro do input/select centralizado */
 }
 
-// Iniciar
-function iniciarPartida() {
-  nomeJogador = inputNome.value.trim() || "Jogador 1";
-  nivelIA = selectNivel.value;
-
-  labelJogador.textContent = nomeJogador + " (X)";
-  labelIA.textContent = `IA ${nivelIA.charAt(0).toUpperCase() + nivelIA.slice(1)} (O)`;
-
-  entrada.classList.add("hidden");
-  placarEl.classList.remove("hidden");
-
-  limparTudo();
-  jogoAtivo = true;
-  statusTexto.textContent = `Vez de ${nomeJogador} (X)`;
+button {
+  padding: 14px 36px;         /* ← AUMENTEI o padding (maior largura e altura) */
+  font-size: 1.15rem;         /* um pouco maior que antes */
+  font-weight: bold;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.25s;
+  min-width: 160px;           /* garante largura mínima maior */
+  height: 48px;               /* mesma altura do input e select */
+  display: flex;              /* importante para centralizar texto */
+  align-items: center;        /* centraliza texto verticalmente */
+  justify-content: center;    /* centraliza texto horizontalmente */
+  text-align: center;         /* reforço extra */
 }
 
-// Cliques e jogadas básicas (igual antes)
-function clicouNaCasa(e) {
-  const indice = Number(e.target.dataset.index);
-  if (!jogoAtivo || tabuleiro[indice] !== null) return;
-
-  fazerJogada(indice, simboloJogador);
-  if (verificarFimDeJogo(simboloJogador, nomeJogador, true)) return;  // true = jogador ganhou
-
-  jogoAtivo = false;
-  statusTexto.textContent = "IA pensando...";
-  setTimeout(jogadaDaIA, 400 + Math.random() * 300);  // delay variável
+/* Botão específico de iniciar */
+#startBtn {
+  background: #28a745;
+  color: white;
 }
 
-function fazerJogada(pos, simbolo) {
-  tabuleiro[pos] = simbolo;
-  const celula = casas[pos];
-  celula.textContent = simbolo;
-  celula.classList.add(simbolo.toLowerCase(), "ocupada");
+#startBtn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(33,136,56,0.4);
 }
 
-function verificarFimDeJogo(simbolo, nome, ehJogador) {
-  if (teveVencedor(simbolo)) {
-    pintarVencedor(simbolo);
-    statusTexto.textContent = `${nome} ganhou! 🏆`;
-    jogoAtivo = false;
-    btnReiniciar.classList.remove("hidden");
-    if (ehJogador) placar.vitoriasJogador++;
-    else placar.vitoriasIA++;
-    salvarPlacar();
-    atualizarPlacar();
-    return true;
+.nomes-jogadores {
+  display: flex; justify-content: center; gap: 20px; margin: 15px 0 10px; font-size: 1.2rem; font-weight: bold;
+}
+
+.nomes-jogadores span { padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); }
+
+.placar {
+  font-size: 1.3rem; font-weight: bold; margin: 10px 0 25px;
+  background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 25px;
+}
+
+.status { font-size: 1.4rem; min-height: 50px; margin-bottom: 25px; font-weight: bold; }
+
+.tabuleiro {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 360px; margin: 0 auto 30px;
+}
+
+.cell {
+  aspect-ratio: 1/1; background: rgba(255,255,255,0.92); border-radius: 12px; font-size: 3.8rem; font-weight: bold;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s;
+}
+
+.cell:hover:not(.ocupada) { background: white; transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+.cell.x { color: #dc3545; }
+.cell.o { color: #007bff; }
+.cell.ocupada { cursor: default; }
+.cell.vencedor {
+  background: linear-gradient(45deg, #ffc107, #ff9800) !important; color: white !important;
+  animation: pisca 0.6s infinite alternate; box-shadow: 0 0 30px rgba(255,193,7,0.7) !important;
+}
+
+@keyframes pisca { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+.btn-reiniciar {
+  padding: 14px 40px; font-size: 1.3rem; background: #fd7e14; color: white; border: none;
+  border-radius: 30px; cursor: pointer; margin-top: 10px;
+}
+.btn-reiniciar:hover { background: #e06c00; transform: translateY(-3px); }
+
+.hidden { display: none !important; }
+
+@media (max-width: 480px) {
+  .entrada-jogadores {
+    flex-direction: column;     /* empilha um embaixo do outro */
+    gap: 14px;
   }
-  if (tabuleiro.every(c => c !== null)) {
-    statusTexto.textContent = "Deu velha! 😐";
-    jogoAtivo = false;
-    btnReiniciar.classList.remove("hidden");
-    placar.empates++;
-    salvarPlacar();
-    atualizarPlacar();
-    return true;
+  
+  input, select, button {
+    width: 100%;                /* ocupa toda a largura */
+    max-width: none;
   }
-  return false;
 }
-
-function teveVencedor(simbolo) {
-  return vitorias.some(combo => combo.every(i => tabuleiro[i] === simbolo));
-}
-
-function pintarVencedor(simbolo) {
-  vitorias.forEach(combo => {
-    if (combo.every(i => tabuleiro[i] === simbolo)) {
-      combo.forEach(i => casas[i].classList.add("vencedor"));
-    }
-  });
-}
-
-function limparTudo() {
-  tabuleiro.fill(null);
-  casas.forEach(c => {
-    c.textContent = "";
-    c.classList.remove("x", "o", "ocupada", "vencedor");
-  });
-  btnReiniciar.classList.add("hidden");
-}
-
-function reiniciarJogo() {
-  limparTudo();
-  entrada.classList.remove("hidden");
-  placarEl.classList.add("hidden");
-  statusTexto.textContent = "Escolha dificuldade e inicie!";
-  jogoAtivo = false;
-}
-
-// ===================================
-// NÍVEIS DA IA (NOVO!)
-// ===================================
-function jogadaDaIA() {
-  let posicao;
-  if (nivelIA === 'facil') {
-    posicao = jogadaFacil();
-  } else if (nivelIA === 'medio') {
-    posicao = jogadaMedia();
-  } else {  // dificil
-    posicao = minimax(tabuleiro, simboloIA).index;
-  }
-
-  fazerJogada(posicao, simboloIA);
-  verificarFimDeJogo(simboloIA, "IA", false);
-
-  jogoAtivo = true;
-  statusTexto.textContent = `Vez de ${nomeJogador}`;
-}
-
-// FÁCIL: aleatória
-function jogadaFacil() {
-  let vazias = [];
-  for (let i = 0; i < 9; i++) if (tabuleiro[i] === null) vazias.push(i);
-  return vazias[Math.floor(Math.random() * vazias.length)];
-}
-
-// MÉDIO: ganha ou bloqueia primeiro
-function jogadaMedia() {
-  // 1. Tenta ganhar
-  for (let i = 0; i < 9; i++) {
-    if (tabuleiro[i] === null) {
-      tabuleiro[i] = simboloIA;
-      if (teveVencedor(simboloIA)) {
-        tabuleiro[i] = null;  // desfaz
-        return i;
-      }
-      tabuleiro[i] = null;
-    }
-  }
-
-  // 2. Bloqueia jogador
-  for (let i = 0; i < 9; i++) {
-    if (tabuleiro[i] === null) {
-      tabuleiro[i] = simboloJogador;
-      if (teveVencedor(simboloJogador)) {
-        tabuleiro[i] = null;
-        return i;
-      }
-      tabuleiro[i] = null;
-    }
-  }
-
-  // 3. Aleatória
-  return jogadaFacil();
-}
-
-// DIFÍCIL: Minimax (igual antes, otimizado)
-function minimax(novoTabuleiro, jogador) {
-  const vazias = novoTabuleiro.reduce((acc, val, idx) => val === null ? acc.concat(idx) : acc, []);
-
-  if (teveVencedor(simboloJogador)) return { score: -10 };
-  if (teveVencedor(simboloIA)) return { score: 10 };
-  if (vazias.length === 0) return { score: 0 };
-
-  const movimentos = [];
-  for (let i = 0; i < vazias.length; i++) {
-    const indice = vazias[i];
-    novoTabuleiro[indice] = jogador;
-    const resultado = minimax(novoTabuleiro, jogador === simboloIA ? simboloJogador : simboloIA);
-    movimentos.push({ index: indice, score: resultado.score });
-    novoTabuleiro[indice] = null;
-  }
-
-  let melhor = jogador === simboloIA ? movimentos.reduce((prev, curr) => curr.score > prev.score ? curr : prev) :
-                                     movimentos.reduce((prev, curr) => curr.score < prev.score ? curr : prev);
-  return melhor;
-}
-
-// Eventos
-btnIniciar.addEventListener("click", iniciarPartida);
-btnReiniciar.addEventListener("click", reiniciarJogo);
-casas.forEach(casa => casa.addEventListener("click", clicouNaCasa));
-inputNome.addEventListener("keypress", e => { if (e.key === "Enter") iniciarPartida(); });
-
-carregarPlacar();  // carrega placar ao abrir página
