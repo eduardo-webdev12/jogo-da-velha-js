@@ -1,4 +1,4 @@
-// JOGO DA VELHA - NÍVEIS DE IA + PLACAR PERSISTENTE
+// JOGO DA VELHA - NÍVEIS DE IA + PLACAR ATIVO
 
 let tabuleiro = Array(9).fill(null);
 let jogoAtivo = false;
@@ -219,4 +219,5 @@ inputNome.addEventListener("keypress", e => {
 
 // Inicializa placar
 carregarPlacar();
+
 
