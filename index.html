@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jogo da Velha - IA Imbatível</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Velha - Níveis de IA</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="container">
-
-    <h1>Jogo da Velha</h1>
+    <h1>🎮 Jogo da Velha</h1>
 
     <div id="entrada" class="entrada-jogadores">
-      <input 
-        type="text" 
-        id="player1" 
-        placeholder="Seu nome (X)" 
-        value="Jogador 1"
-      >
+      <input type="text" id="player1" placeholder="Seu nome (X)" value="Jogador 1">
+      
+      <select id="nivelSelect">
+        <option value="facil">Fácil 🥳</option>
+        <option value="medio">Médio 🤔</option>
+        <option value="dificil" selected>Difícil 💪</option>
+      </select>
+      
       <button id="startBtn">Iniciar Partida</button>
     </div>
 
@@ -27,26 +27,21 @@
       <span id="aiLabel"></span>
     </div>
 
-    <div id="status" class="status">
-      Digite seu nome e clique em "Iniciar Partida"
+    <div id="placar" class="placar hidden">
+      <span id="vitoriasJogador">0</span> | 
+      <span id="vitoriasIA">0</span> | 
+      <span id="empates">0</span>
     </div>
+
+    <div id="status" class="status">Digite seu nome e escolha dificuldade!</div>
 
     <div class="tabuleiro">
-      <div class="cell" data-index="0"></div>
-      <div class="cell" data-index="1"></div>
-      <div class="cell" data-index="2"></div>
-      <div class="cell" data-index="3"></div>
-      <div class="cell" data-index="4"></div>
-      <div class="cell" data-index="5"></div>
-      <div class="cell" data-index="6"></div>
-      <div class="cell" data-index="7"></div>
-      <div class="cell" data-index="8"></div>
+      <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
     </div>
 
-    <button id="restart" class="btn-reiniciar hidden">
-      Jogar Novamente
-    </button>
-
+    <button id="restart" class="btn-reiniciar hidden">Jogar Novamente</button>
   </div>
 
   <script src="script.js"></script>
